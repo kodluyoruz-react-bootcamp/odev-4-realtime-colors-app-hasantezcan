@@ -1,0 +1,16 @@
+.colorPicker {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	flex-direction: column;
+	height: 100vh;
+}
+
+.setColoBbutton {
+	margin-top: 2vh;
+	width: 11vh;
+	height: 4vh;
+	font-size: medium;
+	font-family: ui-monospace;
+}
