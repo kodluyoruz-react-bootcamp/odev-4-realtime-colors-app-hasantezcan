@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import "react-colorful/dist/index.css";
+import { Animated } from "react-animated-css";
+import { GetColorName } from "hex-color-to-color-name";
 
 import {
 	initSocket,
@@ -12,27 +14,37 @@ import {
 import styles from "./styles.module.css";
 
 function ColorPicker() {
-    const [color, setColor] = useState("#aabbcc");
-    const [isCahange, setIsCahange] = useState(false)
+	const [color, setColor] = useState("#aabbcc");
+	const [sendedColor, setSendedColor] = useState("");
+	const [alertIsVisable, setAlertIsVisable] = useState(false);
+	const [triger, setTriger] = useState("");
 
 	useEffect(() => {
-        console.log("PAGE COLOR IS", color);
-        setIsCahange(true)
-	}, [color]);
+		setTimeout(function () {
+			setAlertIsVisable(false);
+		}, 5000);
+	}, [sendedColor]);
 
 	useEffect(() => {
 		initSocket();
-		subscribeToColor((recievedColor) => setColor(recievedColor));
+		subscribeToColor((recievedColor) => {
+			setColor(recievedColor);
+			setTriger(recievedColor);
+		});
 		return () => disconnectSocket();
 	}, []);
 
-	// const handleClick = () => {
-	// 	console.log("clicked");
-	// 	setDisplayColorPicker(!displayColorPicker);
-	// };
+	useEffect(() => {
+		setSendedColor(triger);
+		setAlertIsVisable(true);
+
+		return () => setAlertIsVisable(false);
+	}, [triger]);
 
 	const handleSendColor = () => {
+		setSendedColor(color);
 		sendColor(color);
+		setAlertIsVisable(true);
 	};
 
 	return (
@@ -42,7 +54,18 @@ function ColorPicker() {
 				backgroundColor: `${color}`,
 			}}
 		>
-			
+			{
+				// eslint-disable-next-line
+				alertIsVisable && !sendedColor.length == 0 && (
+					<>
+						<Animated animationIn="flash">
+							<h2>
+								Sayfa rengi "{GetColorName(sendedColor)}" olarak güncellendi
+							</h2>
+						</Animated>
+					</>
+				)
+			}
 			<h2>Select color</h2>
 			<HexColorPicker color={color} onChange={setColor} />
 			<button
